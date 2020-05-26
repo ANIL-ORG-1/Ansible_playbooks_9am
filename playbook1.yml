@@ -1,0 +1,10 @@
+---
+- name: Create a file
+  hosts: all
+  tasks:
+   - name: Creating a file on servers
+     file:
+      name: /tmp/file100
+      state: touch
+
+...

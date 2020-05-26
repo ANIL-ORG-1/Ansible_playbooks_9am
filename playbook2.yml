@@ -1,0 +1,13 @@
+---
+- name: Create users and copy /etc/passwd file
+  hosts: all
+  tasks:
+   - name: Creating user
+     user:
+      name: Anu
+      password: intelliqit
+      home: /home/Anu
+   - name: Copy the passwd file
+     copy:
+      src: /etc/passwd
+      dest: /home/Anu

@@ -1,0 +1,40 @@
+---
+- name: Configure jenkins and dependency s/w
+  hosts: jenkinsserver
+  tasks:
+   - name: Install dependency s/w
+     apt:
+      name: "{{item.a}}"
+      state: "{{item.b}}"
+      update_cache: "{{item.c}}"
+     with_items:
+      - {a: openjdk-8-jdk,b: present,c: yes}
+      - {a: git,b: present,c: no}
+      - {a: maven,b: present,c: no}
+   - name: Download jenkins.war
+     get_url:
+      url: http://mirrors.jenkins.io/war-stable/latest/jenkins.war
+      dest: /home/ubuntu/jenkins
+- name: Configuring tomcat8 on qa and prodservers
+  hosts: servers
+  tasks:
+   - name: Install tomcat8 and tomcat8-admin
+     apt:
+      name: "{{item.a}}"
+      state: "{{item.b}}"
+      update_cache: "{{item.c}}"
+     with_items:
+      - {a: tomcat8,b: present,c: yes}
+      - {a: tomcat8-admin,b: present,c: no}
+   - name: Copy tomcat-users.xml
+     copy:
+      src: tomcat-users.xml
+      dest: /etc/tomcat8
+     notify: Restart tomcat
+  handlers:
+   - name: Restart tomcat
+     service:
+      name: tomcat8
+      state: restarted
+
+...

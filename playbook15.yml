@@ -1,0 +1,19 @@
+---
+- name: Tagging in Ansible
+  hosts: all
+  tasks:
+   - name: Clone git repo
+     git:
+      repo: https://github.com/intelliqittrainings/mymaven1.git
+      dest: /tmp/newgit
+     tags: git_clone
+   - name: User creation
+     user:
+      name: Harish
+      password: intelliqit
+     tags: user_creation
+   - name: Copy passwd file
+     copy:
+      src: /etc/passwd
+      dest: /tmp
+...

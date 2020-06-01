@@ -1,0 +1,19 @@
+---
+- name: Eorror Handling for configuring tomcat
+  hosts: all
+  tasks:
+   - block:
+      - name: Install tomcat7
+        apt:
+         name: tomcat7
+         state: present
+     rescue:
+      - name: Install tomcat8
+        apt:
+         name: tomcat8
+         state: present
+     always:
+      - name: Print success or failure msg
+        debug:
+         msg: Tomcat configured successfully
+   

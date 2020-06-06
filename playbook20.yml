@@ -1,0 +1,9 @@
+---
+- name: Create a user
+  user:
+   name: Ramu
+   password: intelliqit
+   home: /home/Ramu
+   uid: 6655
+   shell: /bin/bash
+...

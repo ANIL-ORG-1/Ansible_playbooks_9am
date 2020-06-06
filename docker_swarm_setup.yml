@@ -1,0 +1,20 @@
+---
+- name: Setup docker on all servers
+  hosts: all
+  tasks:
+   - name: Download the shell script for docker and execute the script
+     shell: "{{item}}"
+     with_items:
+      - curl -fsSL https://get.docker.com -o get-docker.sh
+      - sh get-docker.sh
+        #- name: Initilise swwarm on manager
+        # hosts: Manager
+        # tasks:
+        # - name: Create the swarm
+        # shell: docker swarm init --advertise-addr 172.31.50.233
+- name: Add Workers to the swarm
+  hosts: Workers
+  tasks:
+   - name: Execute the toke id on Workers
+     shell: docker swarm join --token SWMTKN-1-1pfta6zopuzo606cxgnx0y7wd1do0wz10oet3t533lm80fyoa9-bzhhdukfnkcn1arzo8ksnpwk7 172.31.50.233:2377
+

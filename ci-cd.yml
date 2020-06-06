@@ -1,0 +1,58 @@
+---
+- name: Install s/w on devserver
+  hosts: devserver
+  tasks:
+   - name: Install required s/w
+     apt:
+      name: "{{item.a}}"
+      state: "{{item.b}}"
+      update_cache: "{{item.c}}"
+     with_items:
+      - {a: openjdk-8-jdk,b: present,c: yes}
+      - {a: git,b: present,c: no}
+      - {a: maven,b: present,c: no}
+- name: Setup tomcat on qa and prodserver
+  hosts: servers
+  tasks:
+   - name: Install tomcat8 and tomcat8-admin
+     apt:
+      name: "{{item.a}}"
+      state: "{{item.b}}"
+      update_cache: "{{item.c}}"
+     with_items:
+      - {a: tomcat8,b: present,c: yes}
+      - {a: tomcat8-admin,b: present,c: no}
+- name: Continuous Download and Continuous Build
+  hosts: devserver
+  tasks:
+   - name: Download the development code from git repo
+     git:
+      repo: https://github.com/intelliqittrainings/maven.git
+      dest: /home/ubuntu/dev-git
+   - name: Build an artifact from the downloaded code using maven
+     shell: cd /home/ubuntu/dev-git;mvn package
+   - name: Fetch the artifact from devserver to controller
+     fetch:
+      src: /home/ubuntu/dev-git/webapp/target/webapp.war
+      dest: /tmp
+- name: Continuous Deployment and Continuous Testing
+  hosts: qaserver 
+  tasks:
+   - name: Deploy the artifact into the QAServer
+     copy:
+      src: /tmp/172.31.50.233/home/ubuntu/dev-git/webapp/target/webapp.war
+      dest: /var/lib/tomcat8/webapps/testapp.war
+   - name: Download the selenium scripts
+     git:
+      repo: https://github.com/intelliqittrainings/FunctionalTesting.git
+      dest: /home/ubuntu/test-git
+   - name: Execute the selenium scripts
+     shell: java -jar /home/ubuntu/test-git/testing.jar
+- name: Continuous Delivery
+  hosts: prodserver
+  tasks:
+   - name: Copy the artifact into tomcat on the Prodserver
+     copy:  
+      src: /tmp/172.31.50.233/home/ubuntu/dev-git/webapp/target/webapp.war
+      dest: /var/lib/tomcat8/webapps/prodapp.war
+...
